@@ -20,7 +20,6 @@ func HTTPPanicMiddleware() echo.MiddlewareFunc {
 					tracer.SetError(ctx, err)
 					Log(ctx, LogParam{
 						Error:         err,
-						Message:       err.Error(),
 						OperationName: c.Request().Host + c.Request().RequestURI,
 						Scope:         c.Request().Method,
 						IsSentry:      true,

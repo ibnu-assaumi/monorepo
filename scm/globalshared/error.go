@@ -20,13 +20,8 @@ func NewErrorDB(msg string) *ErrorDB {
 }
 
 func NewErrorDBGorm(err error) error {
-	if err != nil {
-		if strings.Contains(err.Error(), "context") {
-			return err
-		}
-		if err != gorm.ErrRecordNotFound {
-			return NewErrorDB(err.Error())
-		}
+	if err != nil && err != gorm.ErrRecordNotFound && !strings.Contains(err.Error(), "context") {
+		return NewErrorDB(err.Error())
 	}
 	return err
 }

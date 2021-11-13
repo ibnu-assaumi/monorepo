@@ -18,17 +18,11 @@ func (uc *masterUsecase) GetSOPrefix(ctx context.Context, filter domain.FilterGe
 
 	eg.Go(func() error {
 		count, err = uc.repoSQL.MasterRepo().CountSOPrefix(egCtx, filter)
-		if err != nil {
-			return err
-		}
-		return nil
+		return err
 	})
 	eg.Go(func() error {
 		data, err = uc.repoSQL.MasterRepo().GetAllSOPrefix(egCtx, filter)
-		if err != nil {
-			return err
-		}
-		return nil
+		return err
 	})
 
 	if err := eg.Wait(); err != nil {

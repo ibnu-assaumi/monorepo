@@ -92,7 +92,6 @@ func (c *callbacks) after(db *gorm.DB, operation string) {
 	if db.Statement.Error != nil && db.Statement.Error != gorm.ErrRecordNotFound {
 		logParam := LogParam{
 			Error:         db.Statement.Error,
-			Message:       fmt.Sprintf("query : %s || vars : %v", db.Statement.SQL.String(), db.Statement.Vars),
 			OperationName: operation,
 			Scope:         fmt.Sprintf("%s table %s", operation, db.Statement.Table),
 		}
@@ -100,7 +99,6 @@ func (c *callbacks) after(db *gorm.DB, operation string) {
 			logParam.IsSentry = true
 			SlackSend(trace.Context(), SlackParam{
 				Title:         "Error Database",
-				Message:       db.Statement.Error.Error(),
 				OperationName: operation,
 				Error:         db.Statement.Error,
 			})
