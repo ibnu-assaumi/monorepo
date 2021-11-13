@@ -7,15 +7,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Bhinneka/candi/config/env"
-
-	"github.com/Bhinneka/candi/tracer"
-
-	"github.com/Bhinneka/candi/codebase/interfaces"
+	"gorm.io/gorm"
 
 	"github.com/Bhinneka/candi/candihelper"
-
-	"gorm.io/gorm"
+	"github.com/Bhinneka/candi/codebase/interfaces"
+	"github.com/Bhinneka/candi/config/env"
+	"github.com/Bhinneka/candi/tracer"
 )
 
 const (
@@ -94,6 +91,13 @@ func (c *callbacks) after(db *gorm.DB, operation string) {
 	trace.SetTag("db.err", db.Statement.Error)
 	if db.Statement.Error != nil && db.Statement.Error != gorm.ErrRecordNotFound {
 		trace.SetError(db.Statement.Error)
+		Log(trace.Context(), LogParam{
+			Error:         db.Statement.Error,
+			Message:       fmt.Sprintf("query : %s || vars : %v", db.Statement.SQL.String(), db.Statement.Vars),
+			OperationName: operation,
+			IsSentry:      true,
+			Scope:         fmt.Sprintf("%s table %s", operation, db.Statement.Table),
+		})
 	}
 
 	d, _ := db.DB()
@@ -122,7 +126,7 @@ func registerCallbacks(db *gorm.DB, name string, c *callbacks) {
 		db.Callback().Row().Before(gormCallbackName).Register(beforeName, c.beforeRowQuery)
 		db.Callback().Row().After(gormCallbackName).Register(afterName, c.afterRowQuery)
 	case "raw":
-		db.Callback().Raw().Before(gormCallbackName).Register(beforeName, c.beforeRowQuery)
-		db.Callback().Raw().After(gormCallbackName).Register(afterName, c.afterRowQuery)
+		db.Callback().Raw().Before(gormCallbackName).Register(beforeName, c.beforeRawQuery)
+		db.Callback().Raw().After(gormCallbackName).Register(afterName, c.afterRawQuery)
 	}
 }

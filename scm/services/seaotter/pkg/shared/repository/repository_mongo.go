@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 
 	// @candi:repositoryImport
+	masterrepo "monorepo/services/seaotter/internal/modules/master/repository"
 	salesorderrepo "monorepo/services/seaotter/internal/modules/salesorder/repository"
 )
 
@@ -13,6 +14,7 @@ type (
 	// RepoMongo abstraction
 	RepoMongo interface {
 		// @candi:repositoryMethod
+		MasterRepo() masterrepo.MasterRepoMongo
 		SalesorderRepo() salesorderrepo.SalesorderRepository
 	}
 
@@ -21,6 +23,7 @@ type (
 
 		// register all repository from modules
 		// @candi:repositoryField
+		masterRepo     masterrepo.MasterRepoMongo
 		salesorderRepo salesorderrepo.SalesorderRepository
 	}
 )
@@ -33,6 +36,7 @@ func setSharedRepoMongo(readDB, writeDB *mongo.Database) {
 		readDB: readDB, writeDB: writeDB,
 
 		// @candi:repositoryConstructor
+		masterRepo:     masterrepo.NewMasterRepoMongo(readDB, writeDB),
 		salesorderRepo: salesorderrepo.NewSalesorderRepoMongo(readDB, writeDB),
 	}
 }
@@ -43,7 +47,10 @@ func GetSharedRepoMongo() RepoMongo {
 }
 
 // @candi:repositoryImplementation
+func (r *repoMongoImpl) MasterRepo() masterrepo.MasterRepoMongo {
+	return r.masterRepo
+}
+
 func (r *repoMongoImpl) SalesorderRepo() salesorderrepo.SalesorderRepository {
 	return r.salesorderRepo
 }
-

@@ -11,6 +11,7 @@ import (
 	"github.com/Bhinneka/candi/codebase/factory/types"
 
 	"monorepo/services/seaotter/configs"
+	"monorepo/services/seaotter/internal/modules/master"
 	"monorepo/services/seaotter/internal/modules/salesorder"
 )
 
@@ -28,6 +29,7 @@ func NewService(cfg *config.Config) factory.ServiceFactory {
 	deps := configs.LoadServiceConfigs(cfg)
 
 	modules := []factory.ModuleFactory{
+		master.NewModule(deps),
 		salesorder.NewModule(deps),
 	}
 

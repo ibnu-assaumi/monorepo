@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	// @candi:usecaseImport
+	masterusecase "monorepo/services/seaotter/internal/modules/master/usecase"
 	salesorderusecase "monorepo/services/seaotter/internal/modules/salesorder/usecase"
 	"monorepo/services/seaotter/pkg/shared/usecase/common"
 
@@ -16,11 +17,13 @@ type (
 	// Usecase unit of work for all usecase in modules
 	Usecase interface {
 		// @candi:usecaseMethod
+		Master() masterusecase.MasterUsecase
 		Salesorder() salesorderusecase.SalesorderUsecase
 	}
 
 	usecaseUow struct {
 		// @candi:usecaseField
+		masterusecase.MasterUsecase
 		salesorderusecase.SalesorderUsecase
 	}
 )
@@ -36,6 +39,8 @@ func SetSharedUsecase(deps dependency.Dependency) {
 		var setSharedUsecaseFunc func(common.Usecase)
 
 		// @candi:usecaseCommon
+		usecaseInst.MasterUsecase, setSharedUsecaseFunc = masterusecase.NewMasterUsecase(deps)
+		setSharedUsecaseFuncs = append(setSharedUsecaseFuncs, setSharedUsecaseFunc)
 		usecaseInst.SalesorderUsecase, setSharedUsecaseFunc = salesorderusecase.NewSalesorderUsecase(deps)
 		setSharedUsecaseFuncs = append(setSharedUsecaseFuncs, setSharedUsecaseFunc)
 
@@ -52,6 +57,10 @@ func GetSharedUsecase() Usecase {
 }
 
 // @candi:usecaseImplementation
+func (uc *usecaseUow) Master() masterusecase.MasterUsecase {
+	return uc.MasterUsecase
+}
+
 func (uc *usecaseUow) Salesorder() salesorderusecase.SalesorderUsecase {
 	return uc.SalesorderUsecase
 }

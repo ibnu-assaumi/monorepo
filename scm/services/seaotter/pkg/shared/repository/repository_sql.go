@@ -7,17 +7,16 @@ import (
 	"database/sql"
 	"fmt"
 
-	// @candi:repositoryImport
-	salesorderrepo "monorepo/services/seaotter/internal/modules/salesorder/repository"
-
-	"github.com/Bhinneka/candi/tracer"
-
-	"github.com/Bhinneka/candi/candishared"
-
-	"monorepo/globalshared"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/Bhinneka/candi/candishared"
+	"github.com/Bhinneka/candi/tracer"
+
+	// @candi:repositoryImport
+	"monorepo/globalshared"
+	masterrepo "monorepo/services/seaotter/internal/modules/master/repository"
+	salesorderrepo "monorepo/services/seaotter/internal/modules/salesorder/repository"
 )
 
 type (
@@ -26,6 +25,7 @@ type (
 		WithTransaction(ctx context.Context, txFunc func(ctx context.Context) error) (err error)
 
 		// @candi:repositoryMethod
+		MasterRepo() masterrepo.MasterRepoSQL
 		SalesorderRepo() salesorderrepo.SalesorderRepository
 	}
 
@@ -34,6 +34,7 @@ type (
 
 		// register all repository from modules
 		// @candi:repositoryField
+		masterRepo     masterrepo.MasterRepoSQL
 		salesorderRepo salesorderrepo.SalesorderRepository
 	}
 )
@@ -76,6 +77,7 @@ func NewRepositorySQL(readDB, writeDB *gorm.DB) RepoSQL {
 		readDB: readDB, writeDB: writeDB,
 
 		// @candi:repositoryConstructor
+		masterRepo:     masterrepo.NewMasterRepoSQL(readDB, writeDB),
 		salesorderRepo: salesorderrepo.NewSalesorderRepoSQL(readDB, writeDB),
 	}
 }
@@ -85,20 +87,25 @@ func (r *repoSQLImpl) WithTransaction(ctx context.Context, txFunc func(ctx conte
 	trace, ctx := tracer.StartTraceWithContext(ctx, "RepoSQL:Transaction")
 	defer trace.Finish()
 
-	tx := r.writeDB.Begin()
-	err = tx.Error
-	if err != nil {
-		return err
-	}
-
-	defer func() {
+	tx, ok := candishared.GetValueFromContext(ctx, candishared.ContextKeySQLTransaction).(*gorm.DB)
+	if !ok {
+		tx = r.writeDB.Begin()
+		err = tx.Error
 		if err != nil {
-			tx.Rollback()
-			trace.SetError(err)
-		} else {
-			tx.Commit()
+			return err
 		}
-	}()
+
+		defer func() {
+			if err != nil {
+				tx.Rollback()
+				trace.SetError(err)
+			} else {
+				tx.Commit()
+			}
+		}()
+
+		ctx = candishared.SetToContext(ctx, candishared.ContextKeySQLTransaction, tx)
+	}
 
 	errChan := make(chan error)
 	go func(ctx context.Context) {
@@ -112,17 +119,21 @@ func (r *repoSQLImpl) WithTransaction(ctx context.Context, txFunc func(ctx conte
 		if err := txFunc(ctx); err != nil {
 			errChan <- err
 		}
-	}(candishared.SetToContext(ctx, candishared.ContextKeySQLTransaction, tx))
+	}(ctx)
 
 	select {
 	case <-ctx.Done():
-		return fmt.Errorf("Canceled or timeout: %v", ctx.Err())
+		return fmt.Errorf("canceled or timeout: %v", ctx.Err())
 	case e := <-errChan:
 		return e
 	}
 }
 
 // @candi:repositoryImplementation
+func (r *repoSQLImpl) MasterRepo() masterrepo.MasterRepoSQL {
+	return r.masterRepo
+}
+
 func (r *repoSQLImpl) SalesorderRepo() salesorderrepo.SalesorderRepository {
 	return r.salesorderRepo
 }
