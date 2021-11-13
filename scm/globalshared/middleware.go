@@ -3,6 +3,7 @@ package globalshared
 import (
 	"fmt"
 	"net/http"
+	"runtime/debug"
 
 	"github.com/Bhinneka/candi/tracer"
 	"github.com/Bhinneka/candi/wrapper"
@@ -18,6 +19,7 @@ func HTTPPanicMiddleware() echo.MiddlewareFunc {
 					ctx := c.Request().Context()
 					err := fmt.Errorf("PANIC: %v", r)
 					tracer.SetError(ctx, err)
+					tracer.Log(ctx, "stack.trace", string(debug.Stack()))
 					Log(ctx, LogParam{
 						Error:         err,
 						OperationName: c.Request().Host + c.Request().RequestURI,
