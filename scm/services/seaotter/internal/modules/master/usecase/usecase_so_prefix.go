@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/Bhinneka/candi/tracer"
-	"github.com/shopspring/decimal"
 	"golang.org/x/sync/errgroup"
 
 	"monorepo/services/seaotter/internal/modules/master/domain"
@@ -14,7 +13,6 @@ import (
 func (uc *masterUsecase) GetSOPrefix(ctx context.Context, filter domain.FilterGetAllSOPrefix) (count int64, data []model.MasterSOPrefix, err error) {
 	trace, ctx := tracer.StartTraceWithContext(ctx, "MasterUsecase:GetSOPrefix")
 	defer trace.Finish()
-	decimal.NewFromInt(1).Div(decimal.NewFromInt(0))
 
 	eg, egCtx := errgroup.WithContext(ctx)
 

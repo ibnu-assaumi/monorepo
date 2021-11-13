@@ -10,7 +10,6 @@ require (
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/lib/pq v1.10.4
 	github.com/pressly/goose/v3 v3.3.1
-	github.com/shopspring/decimal v1.2.0
 	github.com/stretchr/testify v1.7.0
 	go.mongodb.org/mongo-driver v1.7.4
 	go.uber.org/zap v1.16.0
