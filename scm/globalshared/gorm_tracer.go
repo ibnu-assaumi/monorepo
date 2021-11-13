@@ -90,14 +90,24 @@ func (c *callbacks) after(db *gorm.DB, operation string) {
 	trace.SetTag("db.rows_affected", db.RowsAffected)
 	trace.SetTag("db.err", db.Statement.Error)
 	if db.Statement.Error != nil && db.Statement.Error != gorm.ErrRecordNotFound {
-		trace.SetError(db.Statement.Error)
-		Log(trace.Context(), LogParam{
+		logParam := LogParam{
 			Error:         db.Statement.Error,
 			Message:       fmt.Sprintf("query : %s || vars : %v", db.Statement.SQL.String(), db.Statement.Vars),
 			OperationName: operation,
-			IsSentry:      true,
 			Scope:         fmt.Sprintf("%s table %s", operation, db.Statement.Table),
-		})
+		}
+		if !strings.Contains(db.Statement.Error.Error(), "context") && !strings.Contains(db.Statement.Error.Error(), "duplicate") {
+			logParam.IsSentry = true
+			SlackSend(trace.Context(), SlackParam{
+				Title:         "Error Database",
+				Message:       db.Statement.Error.Error(),
+				OperationName: operation,
+				Error:         db.Statement.Error,
+			})
+		}
+
+		trace.SetError(db.Statement.Error)
+		Log(trace.Context(), logParam)
 	}
 
 	d, _ := db.DB()

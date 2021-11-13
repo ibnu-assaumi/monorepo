@@ -2,6 +2,9 @@ package globalshared
 
 import (
 	"net/http"
+	"strings"
+
+	"gorm.io/gorm"
 )
 
 type ErrorDB struct {
@@ -14,6 +17,18 @@ func (e *ErrorDB) Error() string {
 
 func NewErrorDB(msg string) *ErrorDB {
 	return &ErrorDB{Message: msg}
+}
+
+func NewErrorDBGorm(err error) error {
+	if err != nil {
+		if strings.Contains(err.Error(), "context") {
+			return err
+		}
+		if err != gorm.ErrRecordNotFound {
+			return NewErrorDB(err.Error())
+		}
+	}
+	return err
 }
 
 func GetErrorResponse(err error) (int, string) {

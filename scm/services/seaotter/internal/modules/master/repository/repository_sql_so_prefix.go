@@ -21,8 +21,8 @@ func (r *masterRepoSQL) CountSOPrefix(ctx context.Context, filter domain.FilterG
 
 	db := globalshared.SetSpanToGorm(ctx, r.readDB).Model(&model.MasterSOPrefix{})
 	db = filterGetAllSOPrefix(db, filter)
-	if err := db.Count(&count).Error; err != nil && err != gorm.ErrRecordNotFound {
-		return 0, globalshared.NewErrorDB(err.Error())
+	if err := db.Count(&count).Error; err != nil {
+		return 0, globalshared.NewErrorDBGorm(err)
 	}
 	return count, nil
 }
@@ -33,8 +33,8 @@ func (r *masterRepoSQL) GetAllSOPrefix(ctx context.Context, filter domain.Filter
 
 	db := globalshared.SetSpanToGorm(ctx, r.readDB).Model(&model.MasterSOPrefix{})
 	db = filterGetAllSOPrefix(db, filter)
-	if err := db.Find(&data).Error; err != nil && err != gorm.ErrRecordNotFound {
-		return nil, globalshared.NewErrorDB(err.Error())
+	if err := db.Find(&data).Error; err != nil {
+		return nil, globalshared.NewErrorDBGorm(err)
 	}
 	return data, nil
 }

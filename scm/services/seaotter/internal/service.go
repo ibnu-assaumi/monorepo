@@ -6,7 +6,6 @@ import (
 	"github.com/Bhinneka/candi/config"
 
 	"github.com/Bhinneka/candi/codebase/factory"
-	"github.com/Bhinneka/candi/codebase/factory/appfactory"
 	"github.com/Bhinneka/candi/codebase/factory/dependency"
 	"github.com/Bhinneka/candi/codebase/factory/types"
 
@@ -40,7 +39,7 @@ func NewService(cfg *config.Config) factory.ServiceFactory {
 		name:    types.Service(cfg.ServiceName),
 	}
 
-	s.applications = appfactory.NewAppFromEnvironmentConfig(s)
+	s.applications = newAppFromEnvironmentConfig(s)
 
 	// Add custom application runner, must implement `factory.AppServerFactory` methods
 	s.applications = append(s.applications, []factory.AppServerFactory{
