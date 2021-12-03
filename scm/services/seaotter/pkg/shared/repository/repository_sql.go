@@ -26,7 +26,7 @@ type (
 
 		// @candi:repositoryMethod
 		MasterRepo() masterrepo.MasterRepoSQL
-		SalesorderRepo() salesorderrepo.SalesorderRepository
+		SalesorderRepo() salesorderrepo.SalesorderRepoSQL
 	}
 
 	repoSQLImpl struct {
@@ -35,7 +35,7 @@ type (
 		// register all repository from modules
 		// @candi:repositoryField
 		masterRepo     masterrepo.MasterRepoSQL
-		salesorderRepo salesorderrepo.SalesorderRepository
+		salesorderRepo salesorderrepo.SalesorderRepoSQL
 	}
 )
 
@@ -134,6 +134,6 @@ func (r *repoSQLImpl) MasterRepo() masterrepo.MasterRepoSQL {
 	return r.masterRepo
 }
 
-func (r *repoSQLImpl) SalesorderRepo() salesorderrepo.SalesorderRepository {
+func (r *repoSQLImpl) SalesorderRepo() salesorderrepo.SalesorderRepoSQL {
 	return r.salesorderRepo
 }

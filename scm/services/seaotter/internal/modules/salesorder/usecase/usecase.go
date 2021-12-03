@@ -3,19 +3,37 @@
 package usecase
 
 import (
-	"context"
+	"monorepo/services/seaotter/pkg/shared/repository"
+	"monorepo/services/seaotter/pkg/shared/usecase/common"
 
-	"monorepo/services/seaotter/internal/modules/salesorder/domain"
-	shareddomain "monorepo/services/seaotter/pkg/shared/domain"
-
-	"github.com/Bhinneka/candi/candishared"
+	"github.com/Bhinneka/candi/codebase/factory/dependency"
+	"github.com/Bhinneka/candi/codebase/factory/types"
+	"github.com/Bhinneka/candi/codebase/interfaces"
 )
 
 // SalesorderUsecase abstraction
 type SalesorderUsecase interface {
-	GetAllSalesorder(ctx context.Context, filter *domain.FilterSalesorder) (data []shareddomain.Salesorder, meta candishared.Meta, err error)
-	GetDetailSalesorder(ctx context.Context, id string) (data shareddomain.Salesorder, err error)
-	CreateSalesorder(ctx context.Context, data *shareddomain.Salesorder) (err error)
-	UpdateSalesorder(ctx context.Context, id string, data *shareddomain.Salesorder) (err error)
-	DeleteSalesorder(ctx context.Context, id string) (err error)
+}
+
+type salesorderUsecase struct {
+	sharedUsecase common.Usecase
+	cache         interfaces.Cache
+	repoSQL       repository.RepoSQL
+	// repoMongo     repository.RepoMongo
+	kafkaPub interfaces.Publisher
+	// rabbitmqPub   interfaces.Publisher
+}
+
+// NewSalesorderUsecase usecase impl constructor
+func NewSalesorderUsecase(deps dependency.Dependency) (SalesorderUsecase, func(sharedUsecase common.Usecase)) {
+	uc := &salesorderUsecase{
+		cache:   deps.GetRedisPool().Cache(),
+		repoSQL: repository.GetSharedRepoSQL(),
+		// repoMongo: repository.GetSharedRepoMongo(),
+		kafkaPub: deps.GetBroker(types.Kafka).GetPublisher(),
+		// rabbitmqPub: deps.GetBroker(types.RabbitMQ).GetPublisher(),
+	}
+	return uc, func(sharedUsecase common.Usecase) {
+		uc.sharedUsecase = sharedUsecase
+	}
 }

@@ -2,18 +2,19 @@
 
 package repository
 
-import (
-	"context"
+import "gorm.io/gorm"
 
-	"monorepo/services/seaotter/internal/modules/salesorder/domain"
-	shareddomain "monorepo/services/seaotter/pkg/shared/domain"
-)
+// SalesorderRepoSQL abstract interface
+type SalesorderRepoSQL interface {
+}
 
-// SalesorderRepository abstract interface
-type SalesorderRepository interface {
-	FetchAll(ctx context.Context, filter *domain.FilterSalesorder) ([]shareddomain.Salesorder, error)
-	Count(ctx context.Context, filter *domain.FilterSalesorder) int
-	Find(ctx context.Context, filter *domain.FilterSalesorder) (shareddomain.Salesorder, error)
-	Save(ctx context.Context, data *shareddomain.Salesorder) error
-	Delete(ctx context.Context, id string) (err error)
+type salesorderRepoSQL struct {
+	readDB, writeDB *gorm.DB
+}
+
+// NewSalesorderRepoSQL mongo repo constructor
+func NewSalesorderRepoSQL(readDB, writeDB *gorm.DB) SalesorderRepoSQL {
+	return &salesorderRepoSQL{
+		readDB, writeDB,
+	}
 }

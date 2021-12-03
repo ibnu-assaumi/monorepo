@@ -6,7 +6,7 @@ import (
 	// "monorepo/services/seaotter/internal/modules/salesorder/delivery/graphqlhandler"
 	// "monorepo/services/seaotter/internal/modules/salesorder/delivery/grpchandler"
 	"monorepo/services/seaotter/internal/modules/salesorder/delivery/resthandler"
-	"monorepo/services/seaotter/internal/modules/salesorder/delivery/workerhandler"
+	// "monorepo/services/seaotter/internal/modules/salesorder/delivery/workerhandler"
 	"monorepo/services/seaotter/pkg/shared/usecase"
 
 	"github.com/Bhinneka/candi/codebase/factory/dependency"
@@ -35,14 +35,14 @@ func NewModule(deps dependency.Dependency) *Module {
 	// mod.grpcHandler = grpchandler.NewGRPCHandler(usecase.GetSharedUsecase(), deps)
 	// mod.graphqlHandler = graphqlhandler.NewGraphQLHandler(usecase.GetSharedUsecase(), deps)
 
-	mod.workerHandlers = map[types.Worker]interfaces.WorkerHandler{
-		types.Kafka:           workerhandler.NewKafkaHandler(usecase.GetSharedUsecase(), deps),
-		types.Scheduler:       workerhandler.NewCronHandler(usecase.GetSharedUsecase(), deps),
-		types.RedisSubscriber: workerhandler.NewRedisHandler(usecase.GetSharedUsecase(), deps),
-		types.TaskQueue:       workerhandler.NewTaskQueueHandler(usecase.GetSharedUsecase(), deps),
-		// types.PostgresListener: workerhandler.NewPostgresListenerHandler(usecase.GetSharedUsecase(), deps),
-		// types.RabbitMQ: workerhandler.NewRabbitMQHandler(usecase.GetSharedUsecase(), deps),
-	}
+	// mod.workerHandlers = map[types.Worker]interfaces.WorkerHandler{
+	// types.Kafka:           workerhandler.NewKafkaHandler(usecase.GetSharedUsecase(), deps),
+	// types.Scheduler:       workerhandler.NewCronHandler(usecase.GetSharedUsecase(), deps),
+	// types.RedisSubscriber: workerhandler.NewRedisHandler(usecase.GetSharedUsecase(), deps),
+	// types.TaskQueue:       workerhandler.NewTaskQueueHandler(usecase.GetSharedUsecase(), deps),
+	// types.PostgresListener: workerhandler.NewPostgresListenerHandler(usecase.GetSharedUsecase(), deps),
+	// types.RabbitMQ: workerhandler.NewRabbitMQHandler(usecase.GetSharedUsecase(), deps),
+	// }
 
 	mod.serverHandlers = map[types.Server]interfaces.ServerHandler{
 		//

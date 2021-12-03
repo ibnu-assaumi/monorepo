@@ -7,14 +7,14 @@ import (
 
 	"gorm.io/gorm"
 
-	"monorepo/services/seaotter/internal/modules/master/domain"
-	model "monorepo/services/seaotter/pkg/shared/domain"
+	"monorepo/services/seaotter/internal/modules/master/payload"
+	"monorepo/services/seaotter/pkg/shared/model"
 )
 
 // MasterRepoSQL abstract interface
 type MasterRepoSQL interface {
-	CountSOPrefix(ctx context.Context, filter domain.FilterGetAllSOPrefix) (int64, error)
-	GetAllSOPrefix(ctx context.Context, filter domain.FilterGetAllSOPrefix) (data []model.MasterSOPrefix, err error)
+	CountSOPrefix(ctx context.Context, filter payload.RequestGetSOPrexif) (int64, error)
+	GetAllSOPrefix(ctx context.Context, filter payload.RequestGetSOPrexif) (data []model.MasterSOPrefix, err error)
 }
 
 type masterRepoSQL struct {

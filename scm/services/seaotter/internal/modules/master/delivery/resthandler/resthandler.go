@@ -5,11 +5,11 @@ package resthandler
 import (
 	"github.com/labstack/echo"
 
-	"monorepo/services/seaotter/pkg/constant"
-	"monorepo/services/seaotter/pkg/shared/usecase"
-
 	"github.com/Bhinneka/candi/codebase/factory/dependency"
 	"github.com/Bhinneka/candi/codebase/interfaces"
+
+	"monorepo/services/seaotter/pkg/constant"
+	"monorepo/services/seaotter/pkg/shared/usecase"
 )
 
 // RestHandler handler
@@ -27,12 +27,10 @@ func NewRestHandler(uc usecase.Usecase, deps dependency.Dependency) *RestHandler
 }
 
 // Mount handler with root "/"
-// handling version in here
 func (h *RestHandler) Mount(root *echo.Group) {
-	masterV2 := root.Group("")
+	h.mountMasterSOPrefix(root)
+}
 
-	// so prefix
-	masterV2.GET(constant.RouteMasterSOPrefixV2, h.GetSOPrefix)
-	masterV2.POST(constant.RouteMasterSOPrefixV2, nil)
-
+func (h *RestHandler) mountMasterSOPrefix(group *echo.Group) {
+	group.GET(constant.RouteMasterSOPrefixV2, h.getSOPrefix)
 }
